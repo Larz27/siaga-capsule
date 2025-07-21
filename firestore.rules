@@ -1,0 +1,9 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /submissions/{docId} {
+      allow write: if true;     // allow anyone to submit
+      allow read: if false;     // block public reading
+    }
+  }
+}
