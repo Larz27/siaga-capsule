@@ -1,32 +1,58 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const nodemailer = require("nodemailer");
+const admin = require("firebase-admin");
+admin.initializeApp();
 
-const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
+// Add these logs temporarily for debugging
+console.log("Attempting to create transporter with credentials:");
+console.log("  EMAIL_USER:", process.env.EMAIL_USER);
+console.log("  EMAIL_PASSWORD:", process.env.EMAIL_PASSWORD); // Log actual password TEMPORARILY
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+exports.sendConfirmationEmailGen2 = onDocumentCreated("submissions/{submissionId}", async (event) => {
+  const snap = event.data;
+  if (!snap) {
+    console.log("No data associated with the event");
+    return null;
+  }
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+  const submission = snap.data();
+  const userEmail = submission.email;
+
+  if (!userEmail) {
+    console.log("No email address provided for this submission.");
+    return null;
+  }
+
+  const mailOptions = {
+    from: "Siaga Capsule Team <siagacapsule@gmail.com>",
+    to: userEmail,
+    subject: "Your Hope for the Future Has Been Safely Stored!",
+    text: `Hello,
+
+Thank you for contributing to 🌌 Siaga Capsule — Digital Reflections for HBK20! Your hopes and dreams have been safely stored and will be delivered back to you on January 1, 2035, along with a personalized digital certificate of participation.
+
+Once again, thank you for sharing your story. We look forward to rediscovering these reflections together in 2035.
+
+Warm regards,
+The Siaga Capsule Team
+siagacapsule@gmail.com
+https://siaga-capsule.netlify.app`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Confirmation email (Gen 2) sent to:", userEmail);
+    return null;
+  } catch (error) {
+    console.error("Error sending confirmation email (Gen 2):", error);
+    return null;
+  }
+});

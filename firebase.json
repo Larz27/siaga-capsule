@@ -1,6 +1,14 @@
 {
+  "firestore": {
+    "database": "(default)",
+    "location": "asia-southeast1",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
   "functions": [
     {
+      "runtime": "nodejs18",
+      "region": "asia-southeast1",
       "source": "functions",
       "codebase": "default",
       "ignore": [
@@ -11,7 +19,7 @@
         "*.local"
       ],
       "predeploy": [
-       
+        
       ]
     }
   ]
