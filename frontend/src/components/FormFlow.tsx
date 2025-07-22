@@ -60,7 +60,6 @@ const OBSTACLES_OPTIONS = [
 ];
 
 const DISTRICTS = ["Brunei-Muara", "Belait", "Tutong", "Temburong"];
-
 const OCCUPATION_STATUS = [
   "Student",
   "Working",
@@ -68,7 +67,6 @@ const OCCUPATION_STATUS = [
   "Entrepreneur",
   "Other",
 ];
-
 const SECTORS = [
   "Creative Arts",
   "STEM",
@@ -100,31 +98,26 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
   const totalSteps = 6;
 
   const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    }
+    if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
   };
-
   const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
+    if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
   const handleValueToggle = (value: string) => {
-    const newValues = formData.values.includes(value)
+    const newVals = formData.values.includes(value)
       ? formData.values.filter((v) => v !== value)
       : formData.values.length < 3
       ? [...formData.values, value]
       : formData.values;
-    setFormData({ ...formData, values: newValues });
+    setFormData({ ...formData, values: newVals });
   };
 
-  const handleObstacleToggle = (obstacle: string) => {
-    const newObstacles = formData.obstacles.includes(obstacle)
-      ? formData.obstacles.filter((o) => o !== obstacle)
-      : [...formData.obstacles, obstacle];
-    setFormData({ ...formData, obstacles: newObstacles });
+  const handleObstacleToggle = (obs: string) => {
+    const newObs = formData.obstacles.includes(obs)
+      ? formData.obstacles.filter((o) => o !== obs)
+      : [...formData.obstacles, obs];
+    setFormData({ ...formData, obstacles: newObs });
   };
 
   const canProceed = () => {
@@ -171,7 +164,7 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
 
     setLoading(true);
     try {
-      // ── CHECK FOR DUPLICATE EMAIL ───────────────────────────────
+      // ── Prevent duplicate submissions ────────────────────────
       const submissionsRef = collection(db, "submissions");
       const dupQ = query(
         submissionsRef,
@@ -180,15 +173,15 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
       const dupSnap = await getDocs(dupQ);
       if (!dupSnap.empty) {
         toast({
-          title: "Already Submitted",
+          title: "One Email Only",
           description:
-            "This email has already been used. Please use a different email.",
+            "It looks like you’ve already created a capsule with this address. Each email can only be used once.",
           variant: "destructive",
         });
         setLoading(false);
         return;
       }
-      // ─────────────────────────────────────────────────────────────
+      // ────────────────────────────────────────────────────────
 
       await addDoc(submissionsRef, {
         ...formData,
@@ -202,7 +195,7 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
 
       onComplete(formData);
 
-      // reset form
+      // reset
       setFormData({
         question1: "",
         obstacles: [],
@@ -295,7 +288,6 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
                   setFormData({ ...formData, question1: e.target.value })
                 }
                 className="min-h-[150px] bg-white/80 border-purple-200/50 focus:border-purple-400"
-                required
               />
             </div>
           )}
@@ -323,9 +315,7 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
                     }`}
                   >
                     <div className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={formData.obstacles.includes(obstacle)}
-                      />
+                      <Checkbox checked={formData.obstacles.includes(obstacle)} />
                       <Label className="cursor-pointer font-medium">
                         {obstacle}
                       </Label>
@@ -343,7 +333,6 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
                       setFormData({ ...formData, otherObstacle: e.target.value })
                     }
                     className="bg-white/80 border-purple-200/50 focus:border-purple-400"
-                    required
                   />
                 </div>
               )}
@@ -418,7 +407,6 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   className="bg-white/80 border-purple-200/50 focus:border-purple-400"
-                  required
                 />
               </div>
             </div>
@@ -432,7 +420,8 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
                   Tell us a bit about yourself
                 </h2>
                 <p className="text-gray-600">
-                  This helps us understand the voices in our time capsule collection.
+                  This helps us understand the voices in our time capsule
+                  collection.
                 </p>
               </div>
               <div className="grid md:grid-cols-2 gap-4">
@@ -448,7 +437,6 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
                       setFormData({ ...formData, age: e.target.value })
                     }
                     className="bg-white/80 border-purple-200/50 focus:border-purple-400"
-                    required
                   />
                 </div>
                 <div className="space-y-2">
@@ -459,15 +447,14 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
                     onValueChange={(value) =>
                       setFormData({ ...formData, district: value })
                     }
-                    required
                   >
                     <SelectTrigger className="bg-white/80 border-purple-200/50 focus:border-purple-400">
                       <SelectValue placeholder="Select district" />
                     </SelectTrigger>
                     <SelectContent>
-                      {DISTRICTS.map((d) => (
-                        <SelectItem key={d} value={d}>
-                          {d}
+                      {DISTRICTS.map((district) => (
+                        <SelectItem key={district} value={district}>
+                          {district}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -475,21 +462,21 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
                 </div>
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2">
-                    <Briefcase className="w-4 h-4 text-purple-600" /> Occupation/Status
+                    <Briefcase className="w-4 h-4 text-purple-600" /> Occupation
+                    / Status
                   </Label>
                   <Select
                     onValueChange={(value) =>
                       setFormData({ ...formData, occupationStatus: value })
                     }
-                    required
                   >
                     <SelectTrigger className="bg-white/80 border-purple-200/50 focus:border-purple-400">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      {OCCUPATION_STATUS.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
+                      {OCCUPATION_STATUS.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -499,33 +486,29 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
                       placeholder="Please specify your occupation"
                       value={formData.otherOccupation}
                       onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          otherOccupation: e.target.value,
-                        })
+                        setFormData({ ...formData, otherOccupation: e.target.value })
                       }
                       className="bg-white/80 border-purple-200/50 focus:border-purple-400"
-                      required
                     />
                   )}
                 </div>
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2">
-                    <Lightbulb className="w-4 h-4 text-purple-600" /> Sector of Interest
+                    <Lightbulb className="w-4 h-4 text-purple-600" /> Sector
+                    of Interest
                   </Label>
                   <Select
                     onValueChange={(value) =>
                       setFormData({ ...formData, sectorInterest: value })
                     }
-                    required
                   >
                     <SelectTrigger className="bg-white/80 border-purple-200/50 focus:border-purple-400">
                       <SelectValue placeholder="Select sector" />
                     </SelectTrigger>
                     <SelectContent>
-                      {SECTORS.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
+                      {SECTORS.map((sector) => (
+                        <SelectItem key={sector} value={sector}>
+                          {sector}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -538,7 +521,6 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
                         setFormData({ ...formData, otherSector: e.target.value })
                       }
                       className="bg-white/80 border-purple-200/50 focus:border-purple-400"
-                      required
                     />
                   )}
                 </div>
@@ -550,7 +532,9 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
           {currentStep === 6 && (
             <div className="space-y-6">
               <div className="text-center space-y-4">
-                <h2 className="text-2xl font-bold text-gray-800">Privacy Settings</h2>
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Privacy Settings
+                </h2>
                 <p className="text-gray-600">
                   Choose how you'd like your reflection to be handled.
                 </p>
@@ -570,7 +554,7 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
                 </div>
                 <p className="text-sm text-gray-600">
                   {formData.isPrivate
-                    ? "Your message will be kept completely confidential and only delivered to you in 2035."
+                    ? "Your message will be kept confidential and only delivered to you in 2035."
                     : "Anonymous insights from your reflection may be shared publicly to inspire others, but your personal details will never be revealed."}
                 </p>
               </div>
@@ -587,7 +571,6 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
             >
               <ArrowLeft className="w-4 h-4" /> Previous
             </Button>
-
             {currentStep < totalSteps ? (
               <Button
                 onClick={handleNext}
@@ -606,7 +589,7 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
                 <img
                   src="/lovable-uploads/0b01df2f-e663-4703-bddc-110666807832.png"
                   alt="Rocket"
-                  className="w-4 h-4"
+                  className="w-4 h-4 ml-1"
                 />
               </Button>
             )}
