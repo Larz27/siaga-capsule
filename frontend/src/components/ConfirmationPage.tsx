@@ -28,42 +28,41 @@ export const ConfirmationPage = ({
   const [showShareOptions, setShowShareOptions] = useState(false);
 
   const handleDownloadKeepsake = () => {
-    console.log("🔥 Using new PDF certificate template");  // ← confirm in your console
-
+    console.log("🔥 Using new PDF certificate template");
+  
     // 1) Create A4 PDF
     const pdf = new jsPDF({
       orientation: "portrait",
-      unit: "pt",
-      format: "a4",
+      unit:        "pt",
+      format:      "a4",
     });
-
-    // 2) Draw your PNG full‑bleed
+  
+    // 2) Draw your certificate PNG full‑bleed
     const w = pdf.internal.pageSize.getWidth();
     const h = pdf.internal.pageSize.getHeight();
     pdf.addImage(certImg, "PNG", 0, 0, w, h);
-
-    // 3) Overlay the user’s email
-    pdf.setFontSize(18);
-    pdf.setTextColor(255, 255, 255);
+  
+    // 3) Style your text for the email overlay
+    pdf.setFont("helvetica", "bold");   // use a bolder font
+    pdf.setFontSize(24);                // larger size
+    pdf.setCharSpace(1);                // subtle letter‑spacing
+    pdf.setTextColor(255, 255, 255);    // white so it pops
+  
+    // 4) Draw the email centered at ~38% down the page
     pdf.text(
       data.email,
       w / 2,
-      h * 0.38,       // tweak if you need to nudge it up/down
+      h * 0.38,
       { align: "center" }
     );
-
-    // 4) Download
+  
+    // 5) Save the result
     const fileName = `siaga-capsule-certificate-${data.email
       .split("@")[0]
       .replace(/[@.]/g, "-")}.pdf`;
     pdf.save(fileName);
   };
-
-  // … your existing share logic is unchanged …
-  const generateShareableContent = () => ({
-    message: `🚀 I just sealed my hopes and dreams…`,
-    hashtags: "#WawasanBrunei2035 #BruneiYouth #HariBeliaKebangsaan2025",
-  });
+  
   const shareUrl = window.location.origin;
   const handleShare = (platform: string) => { /* … */ };
 
