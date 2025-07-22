@@ -1,48 +1,28 @@
 // frontend/src/components/ConfirmationPage.tsx
-import React, { useEffect, useState } from "react";
-import { useParams }                     from "react-router-dom";
-import { Button }                        from "@/components/ui/button";
-import { Download }                      from "lucide-react";
-import { getDoc, doc }                   from "firebase/firestore";
-import { db }                            from "@/lib/firebase"; 
-import { DigitalKeepsake }               from "@/components/DigitalKeepsake";
+import React from "react";
+import { Button }          from "@/components/ui/button";
+import { Download }        from "lucide-react";
+import { DigitalKeepsake } from "@/components/DigitalKeepsake";
+import { PageType }        from "@/pages/Index";
 
-interface SubmissionData {
+export interface SubmissionData {
   email:       string;
   submittedAt: { toDate: () => Date };
 }
 
-const ConfirmationPage: React.FC = () => {
-  // 1) grab the ID from the URL
-  const { submissionId } = useParams<{ submissionId: string }>();
+interface ConfirmationPageProps {
+  /** Passed from Index.tsx when you navigate to 'confirmation' */
+  data: SubmissionData | null;
+  /** If you need to go back or navigate elsewhere */
+  onNavigate: (page: PageType, data?: any) => void;
+}
 
-  const [data, setData]       = useState<SubmissionData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  // 2) load the Firestore doc
-  useEffect(() => {
-    if (!submissionId) {
-      setLoading(false);
-      return;
-    }
-    (async () => {
-      try {
-        const snap = await getDoc(doc(db, "submissions", submissionId));
-        if (snap.exists()) {
-          setData(snap.data() as SubmissionData);
-        }
-      } catch (err) {
-        console.error("Failed to load submission:", err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [submissionId]);
-
-  if (loading) {
-    return <div className="p-8 text-center">Loading…</div>;
-  }
-  if (!submissionId || !data) {
+const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
+  data,
+  onNavigate
+}) => {
+  // If there’s no data prop, bail out immediately
+  if (!data) {
     return (
       <div className="p-8 text-center text-red-500">
         Submission not found.
@@ -50,7 +30,7 @@ const ConfirmationPage: React.FC = () => {
     );
   }
 
-  // 3) simple link-triggered download of the PNG
+  // Download the PNG directly
   const downloadKeepsakeImage = () => {
     const link = document.createElement("a");
     link.href = "/SiagaCapsule_Cert.png";  
@@ -62,6 +42,7 @@ const ConfirmationPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8">
+      {/* Download button */}
       <Button
         onClick={downloadKeepsakeImage}
         className="gradient-bg-primary hover:opacity-90 flex items-center gap-2 mb-8"
@@ -70,6 +51,7 @@ const ConfirmationPage: React.FC = () => {
         Download Your Certificate
       </Button>
 
+      {/* Render the dynamic cert */}
       <DigitalKeepsake
         email={data.email}
         submittedAt={data.submittedAt.toDate().toISOString()}
