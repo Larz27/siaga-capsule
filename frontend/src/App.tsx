@@ -1,14 +1,10 @@
-// frontend/src/App.tsx
-import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import Index    from "./pages/Index";
+import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import ConfirmationPage from "@/components/ConfirmationPage";
 
 const queryClient = new QueryClient();
 
@@ -19,16 +15,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          {/* Home */}
           <Route path="/" element={<Index />} />
-
-          {/* Your new confirmation route */}
-          <Route
-            path="/confirmation/:submissionId"
-            element={<ConfirmationPage />}
-          />
-
-          {/* Fallback */}
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
