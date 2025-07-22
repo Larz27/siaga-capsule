@@ -3,7 +3,6 @@ import React from "react";
 import { Button }          from "@/components/ui/button";
 import { Download }        from "lucide-react";
 import { DigitalKeepsake } from "@/components/DigitalKeepsake";
-import { PageType }        from "@/pages/Index";
 
 export interface SubmissionData {
   email:       string;
@@ -11,17 +10,16 @@ export interface SubmissionData {
 }
 
 interface ConfirmationPageProps {
-  /** Passed from Index.tsx when you navigate to 'confirmation' */
+  /** Passed from Index.tsx when you finish the form */
   data: SubmissionData | null;
-  /** If you need to go back or navigate elsewhere */
-  onNavigate: (page: PageType, data?: any) => void;
+  onNavigate: (page: string, data?: any) => void;
 }
 
 const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
   data,
-  onNavigate
+  onNavigate,
 }) => {
-  // If there’s no data prop, bail out immediately
+  // If Index.tsx called navigateToPage('confirmation', null) or data is missing:
   if (!data) {
     return (
       <div className="p-8 text-center text-red-500">
@@ -30,10 +28,10 @@ const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
     );
   }
 
-  // Download the PNG directly
+  // Simple PNG download link
   const downloadKeepsakeImage = () => {
     const link = document.createElement("a");
-    link.href = "/SiagaCapsule_Cert.png";  
+    link.href = "/SiagaCapsule_Cert.png";
     link.download = `siaga-capsule-${data.email.split("@")[0]}.png`;
     document.body.appendChild(link);
     link.click();
@@ -42,7 +40,6 @@ const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8">
-      {/* Download button */}
       <Button
         onClick={downloadKeepsakeImage}
         className="gradient-bg-primary hover:opacity-90 flex items-center gap-2 mb-8"
@@ -51,7 +48,6 @@ const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
         Download Your Certificate
       </Button>
 
-      {/* Render the dynamic cert */}
       <DigitalKeepsake
         email={data.email}
         submittedAt={data.submittedAt.toDate().toISOString()}
