@@ -28,7 +28,7 @@ export const ConfirmationPage = ({
   const [showShareOptions, setShowShareOptions] = useState(false);
 
   const handleDownloadKeepsake = () => {
-    console.log("🔥 Using new PDF certificate template");
+    console.log("🔥 Using new PDF certificate template 2.0");
   
     // 1) Create A4 PDF
     const pdf = new jsPDF({
