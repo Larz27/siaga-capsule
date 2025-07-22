@@ -1,10 +1,31 @@
+// frontend/src/App.tsx
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import posthog from "posthog-js";
+
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+
+// initialize PostHog once (use your actual key & host)
+posthog.init("YOUR_PROJECT_API_KEY", {
+  api_host: "https://app.posthog.com",
+  autocapture: true,
+  capture_pageview: false, // we'll capture manually
+  persistence: "localStorage",
+});
+
+// this component fires a pageview on every route change
+function PostHogPageviewTracker() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    posthog.capture("$pageview", { path: pathname });
+  }, [pathname]);
+  return null;
+}
 
 const queryClient = new QueryClient();
 
@@ -14,6 +35,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        {/* track pageviews */}
+        <PostHogPageviewTracker />
+
         <Routes>
           <Route path="/" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

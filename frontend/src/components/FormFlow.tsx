@@ -8,6 +8,7 @@ import {
   getDocs,
   Timestamp,
 } from "firebase/firestore";
+import posthog from "posthog-js";
 import { db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -186,6 +187,19 @@ export const FormFlow = ({ onComplete, onBack }: FormFlowProps) => {
       await addDoc(submissionsRef, {
         ...formData,
         submittedAt: Timestamp.now(),
+      });
+
+      // ——— Identify this user in PostHog ———————
+      posthog.identify(formData.email.trim(), {
+        email: formData.email.trim(),
+        age: formData.age,
+        district: formData.district,
+      });
+
+      // ——— Fire a custom event ——————————————
+      posthog.capture("Time Capsule Created", {
+        email: formData.email.trim(),
+        step: currentStep,
       });
 
       toast({
