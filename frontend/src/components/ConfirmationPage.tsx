@@ -27,7 +27,7 @@ export const ConfirmationPage = ({
   const [showShareOptions, setShowShareOptions] = useState(false);
 
   const handleDownloadKeepsake = () => {
-    console.log("🔥 Using updated PDF certificate template 5.0");
+    console.log("🔥Backend made by Khairul Ikhwan Habib🔥(for copyright reasons)");
 
     // 1) Create A4 PDF in portrait
     const pdf = new jsPDF({
