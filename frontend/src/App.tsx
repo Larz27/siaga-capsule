@@ -10,14 +10,6 @@ import posthog from "posthog-js";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
-// initialize PostHog once (use your actual key & host)
-posthog.init("phc_G5HTBd1pbv5InGevna1aY8KSj1hsXdwUkoBrRWp0k4B", {
-  api_host: "https://app.posthog.com",
-  autocapture: true,
-  capture_pageview: false, // we'll capture manually
-  persistence: "localStorage",
-});
-
 // this component fires a pageview on every route change
 function PostHogPageviewTracker() {
   const { pathname } = useLocation();
