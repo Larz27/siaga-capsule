@@ -1,12 +1,25 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartConfig } from "@/components/ui/chart"
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
-import { Submission } from "@/lib/types"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ChartContainer, ChartConfig } from "@/components/ui/chart";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from "recharts";
+import { Submission } from "@/lib/types";
 
 interface AgeGroupChartProps {
-  submissions: Submission[]
+  submissions: Submission[];
 }
 
 const chartConfig = {
@@ -15,38 +28,51 @@ const chartConfig = {
     color: "var(--color-violet-500)",
   },
   "25-34": {
-    label: "25-34", 
+    label: "25-34",
     color: "var(--color-violet-700)",
   },
   "35+": {
     label: "35+",
     color: "var(--color-violet-900)",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 const COLORS = [
   "var(--color-violet-500)",
-  "var(--color-violet-700)", 
-  "var(--color-violet-900)"
-]
+  "var(--color-violet-700)",
+  "var(--color-violet-900)",
+];
 
 export function AgeGroupChart({ submissions }: AgeGroupChartProps) {
   const ageCounts = submissions.reduce((acc, s) => {
-    const ageGroup = s.age < 25 ? "18-24" : s.age < 35 ? "25-34" : "35+"
-    acc[ageGroup] = (acc[ageGroup] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+    const ageGroup = s.age < 25 ? "18-24" : s.age < 35 ? "25-34" : "35+";
+    acc[ageGroup] = (acc[ageGroup] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
   const chartData = Object.entries(ageCounts).map(([ageGroup, count]) => ({
     name: ageGroup,
     ageGroup,
     count,
-    percentage: Math.round((count / submissions.length) * 100)
-  }))
+    percentage: Math.round((count / submissions.length) * 100),
+  }));
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({
+    active,
+    payload,
+  }: {
+    active: boolean;
+    payload: {
+      name: string;
+      dataKey: string;
+      payload: Record<string, string | number>;
+      type?: string;
+      value: number;
+    }[];
+    label: string;
+  }) => {
     if (active && payload && payload.length) {
-      const data = payload[0].payload
+      const data = payload[0].payload;
       return (
         <div className="bg-background border rounded-lg p-2 shadow-md">
           <p className="text-sm font-medium">{data.ageGroup}</p>
@@ -54,10 +80,10 @@ export function AgeGroupChart({ submissions }: AgeGroupChartProps) {
             {data.count} submissions ({data.percentage}%)
           </p>
         </div>
-      )
+      );
     }
-    return null
-  }
+    return null;
+  };
 
   return (
     <Card>
@@ -76,15 +102,21 @@ export function AgeGroupChart({ submissions }: AgeGroupChartProps) {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ ageGroup, percentage }) => `${ageGroup} (${percentage}%)`}
+                label={({ ageGroup, percentage }) =>
+                  `${ageGroup} (${percentage}%)`
+                }
                 outerRadius={80}
                 fill="var(--color-violet-300)"
                 dataKey="count"
               >
                 {chartData.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
+              {/* @ts-expect-error not sure why this is not working */}
               <Tooltip content={<CustomTooltip />} />
               <Legend />
             </PieChart>
@@ -92,5 +124,5 @@ export function AgeGroupChart({ submissions }: AgeGroupChartProps) {
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -34,7 +34,16 @@ export function OccupationChart({ submissions }: OccupationChartProps) {
     }))
     .sort((a, b) => b.count - a.count)
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload }: {
+    active: boolean;
+    payload: {
+      name: string;
+      dataKey: string;
+      payload: Record<string, string | number>;
+      type?: string;
+      value: number;
+    }[];
+  }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload
       return (
@@ -73,6 +82,7 @@ export function OccupationChart({ submissions }: OccupationChartProps) {
                 interval={0}
               />
               <YAxis />
+              {/* @ts-expect-error not sure why this is not working */}
               <Tooltip content={<CustomTooltip />} />
               <Bar 
                 dataKey="count" 
