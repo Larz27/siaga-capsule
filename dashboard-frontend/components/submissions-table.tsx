@@ -6,17 +6,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Submission } from "@/lib/types"
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Submission } from "@/lib/types";
 
 interface SubmissionsTableProps {
-  submissions: Submission[]
+  submissions: Submission[];
 }
 
 export function SubmissionsTable({ submissions }: SubmissionsTableProps) {
-  const publicSubmissions = submissions.filter(s => !s.isPrivate)
+  const publicSubmissions = submissions.filter((s) => !s.isPrivate);
 
   return (
     <Card>
@@ -44,21 +50,39 @@ export function SubmissionsTable({ submissions }: SubmissionsTableProps) {
             {publicSubmissions.map((submission) => (
               <TableRow key={submission.id}>
                 <TableCell className="font-medium">
-                  {submission.submittedAt?.toLocaleDateString() || 'N/A'}
+                  {submission?.submittedAt
+                    ? new Date(submission.submittedAt).toLocaleDateString()
+                    : "N/A"}
                 </TableCell>
                 <TableCell>{submission.age}</TableCell>
                 <TableCell>{submission.district}</TableCell>
                 <TableCell>
-                  <Badge variant={submission.occupationStatus !== "Other" ? "default" : "secondary"} className="break-all whitespace-normal">
-                    {submission.occupationStatus === "Other" && submission.otherOccupation 
-                      ? submission.otherOccupation 
+                  <Badge
+                    variant={
+                      submission.occupationStatus !== "Other"
+                        ? "default"
+                        : "secondary"
+                    }
+                    className="break-all whitespace-normal"
+                  >
+                    {submission.occupationStatus === "Other" &&
+                    submission.otherOccupation
+                      ? submission.otherOccupation
                       : submission.occupationStatus}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={submission.sectorInterest !== "Other" ? "default" : "secondary"} className="break-all whitespace-normal">
-                    {submission.sectorInterest === "Other" && submission.otherSector 
-                      ? submission.otherSector 
+                  <Badge
+                    variant={
+                      submission.sectorInterest !== "Other"
+                        ? "default"
+                        : "secondary"
+                    }
+                    className="break-all whitespace-normal"
+                  >
+                    {submission.sectorInterest === "Other" &&
+                    submission.otherSector
+                      ? submission.otherSector
                       : submission.sectorInterest}
                   </Badge>
                 </TableCell>
@@ -87,5 +111,5 @@ export function SubmissionsTable({ submissions }: SubmissionsTableProps) {
         </Table>
       </CardContent>
     </Card>
-  )
+  );
 }

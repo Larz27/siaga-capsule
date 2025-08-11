@@ -9,6 +9,6 @@ export interface Submission {
   values: string[];
   obstacles: string[];
   question1: string;
-  submittedAt: Date | null;
+  submittedAt: string | null;
   isPrivate: boolean;
 }

@@ -20,7 +20,7 @@ import {
 
 interface Submission {
   id: string;
-  submittedAt: Date | null;
+  submittedAt: string | null;
   isPrivate: boolean;
 }
 
@@ -45,7 +45,7 @@ export function DailySubmissionsChart({
   const dailyData = submissions.reduce((acc, submission) => {
     if (!submission.submittedAt) return acc;
 
-    const date = submission.submittedAt.toISOString().split("T")[0];
+    const date = submission.submittedAt?.split("T")[0];
 
     if (!acc[date]) {
       acc[date] = { date, public: 0, private: 0 };

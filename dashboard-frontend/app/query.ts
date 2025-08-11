@@ -7,7 +7,6 @@ import {
   where,
   orderBy,
   getCountFromServer,
-  Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
@@ -52,7 +51,9 @@ export async function getSubmissions(isPrivate?: boolean | null) {
         obstacles: data.obstacles || [],
         question1: data.question1 || "",
         isPrivate: data.isPrivate || false,
-        submittedAt: Timestamp.fromJSON(data.submittedAt).toDate() || null,
+        submittedAt: data.submittedAt?.toDate?.()
+          ? data.submittedAt.toDate().toISOString()
+          : data.submittedAt || null,
       };
     });
 
