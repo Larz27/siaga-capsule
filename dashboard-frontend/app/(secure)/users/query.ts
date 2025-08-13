@@ -1,16 +1,22 @@
 "use server";
 
-import { collection, getDocs, query, where, orderBy, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export async function getPublicSubmissions() {
   try {
     const submissionsRef = collection(db, "submissions");
 
-    let q;
-
     // Fetch only public submissions
-    q = query(
+    const q = query(
       submissionsRef,
       where("isPrivate", "==", false),
       orderBy("submittedAt", "desc")
@@ -47,16 +53,19 @@ export async function getPublicSubmissions() {
   }
 }
 
-export async function toggleSubmissionFeatured(submissionId: string, isFeatured: boolean) {
+export async function toggleSubmissionFeatured(
+  submissionId: string,
+  isFeatured: boolean
+) {
   try {
     // Get reference to the specific submission document
     const submissionRef = doc(db, "submissions", submissionId);
-    
+
     // Update the isFeatured field
     await updateDoc(submissionRef, {
       isFeatured: isFeatured,
       // Add a timestamp for when the featured status was last updated
-      featuredUpdatedAt: new Date()
+      featuredUpdatedAt: new Date(),
     });
 
     return { success: true };

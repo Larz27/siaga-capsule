@@ -25,7 +25,8 @@ export const InfiniteMovingCards = ({
 
   useEffect(() => {
     addAnimation();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const [start, setStart] = useState(false);
 
   function addAnimation() {
@@ -119,7 +120,7 @@ export const InfiniteMovingCards = ({
 
                 {/* Quote text with improved typography */}
                 <span className="relative z-20 text-base leading-[1.7] font-medium text-gray-800 dark:text-gray-100">
-                  "{item.quote}"
+                  &quot;{item.quote}&quot;
                 </span>
 
                 {/* Author information with better layout */}

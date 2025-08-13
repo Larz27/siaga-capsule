@@ -10,10 +10,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -55,10 +53,12 @@ export function SectionCards({ initialData }: { initialData: Submission[] }) {
           validAges.reduce((sum, s) => sum + s.age, 0) / validAges.length
         )
       : 0;
-  
+
   // Calculate min and max ages
-  const minAge = validAges.length > 0 ? Math.min(...validAges.map(s => s.age)) : 0;
-  const maxAge = validAges.length > 0 ? Math.max(...validAges.map(s => s.age)) : 0;
+  const minAge =
+    validAges.length > 0 ? Math.min(...validAges.map((s) => s.age)) : 0;
+  const maxAge =
+    validAges.length > 0 ? Math.max(...validAges.map((s) => s.age)) : 0;
 
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
@@ -69,18 +69,18 @@ export function SectionCards({ initialData }: { initialData: Submission[] }) {
             <IconQrcode className="size-5" />
             Time Capsule Access
           </CardDescription>
-        <CardDescription className="flex items-center justify-between gap-4">
-          <Image
-            src="/images/qr-code.png"
-            className="rounded-md"
-            alt="QR Code"
-            width={100}
-            height={100}
-          />
-          <div className="line-clamp-1 flex gap-2 font-medium text-blue-800 dark:text-blue-200 text-xs">
-            Scan the QR code to access the time capsule submission form
-          </div>
-        </CardDescription>
+          <CardDescription className="flex items-center justify-between gap-4">
+            <Image
+              src="/images/qr-code.png"
+              className="rounded-md"
+              alt="QR Code"
+              width={100}
+              height={100}
+            />
+            <div className="line-clamp-1 flex gap-2 font-medium text-blue-800 dark:text-blue-200 text-xs">
+              Scan the QR code to access the time capsule submission form
+            </div>
+          </CardDescription>
         </CardHeader>
       </Card>
 
@@ -100,7 +100,10 @@ export function SectionCards({ initialData }: { initialData: Submission[] }) {
             <div className="text-sm text-muted-foreground">
               {publicSubmissions} public • {privateSubmissions} private
             </div>
-            <Badge variant="outline" className="text-green-700 border-green-300 dark:text-green-300 dark:border-green-600">
+            <Badge
+              variant="outline"
+              className="text-green-700 border-green-300 dark:text-green-300 dark:border-green-600"
+            >
               <IconUsers className="size-3 mr-1" />
               Active
             </Badge>
@@ -148,7 +151,10 @@ export function SectionCards({ initialData }: { initialData: Submission[] }) {
             <div className="text-sm text-muted-foreground">
               {minAge} - {maxAge} years
             </div>
-            <Badge variant="outline" className="text-orange-700 border-orange-300 dark:text-orange-300 dark:border-orange-600">
+            <Badge
+              variant="outline"
+              className="text-orange-700 border-orange-300 dark:text-orange-300 dark:border-orange-600"
+            >
               <IconCalendar className="size-3 mr-1" />
               Demographics
             </Badge>

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 import {
   Card,
@@ -84,7 +84,15 @@ export function ObstaclesPieChart({ initialData }: ObstaclesPieChartProps) {
   const totalObstacleMentions = obstaclesData.reduce((sum, item) => sum + item.value, 0);
 
   // Custom tooltip content
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload }: {
+    active: boolean;
+    payload: {
+      payload: {
+        name: string;
+        value: number;
+      };
+    }[];
+  }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       const percentage = totalObstacleMentions > 0 ? ((data.value / totalObstacleMentions) * 100).toFixed(1) : 0;
@@ -104,7 +112,7 @@ export function ObstaclesPieChart({ initialData }: ObstaclesPieChartProps) {
   // Custom legend content
   const CustomLegend = () => (
     <div className="flex flex-wrap gap-2 justify-center mt-4">
-      {obstaclesData.slice(0, 8).map((entry, index) => (
+      {obstaclesData.slice(0, 8).map((entry) => (
         <div key={entry.name} className="flex items-center gap-2">
           <div 
             className="w-3 h-3 rounded-full" 
@@ -150,6 +158,7 @@ export function ObstaclesPieChart({ initialData }: ObstaclesPieChartProps) {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
+              {/* @ts-expect-error - recharts types are not up to date? */}
               <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
