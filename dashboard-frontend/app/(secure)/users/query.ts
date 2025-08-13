@@ -1,15 +1,8 @@
 "use server";
 
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  orderBy,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { adminDb } from "@/lib/firebase-admin";
 
 export async function getPublicSubmissions() {
   try {
@@ -59,12 +52,8 @@ export async function toggleSubmissionFeatured(
 ) {
   try {
     // Get reference to the specific submission document
-    const submissionRef = doc(db, "submissions", submissionId);
-
-    // Update the isFeatured field
-    await updateDoc(submissionRef, {
+    await adminDb.collection("submissions").doc(submissionId).update({
       isFeatured: isFeatured,
-      // Add a timestamp for when the featured status was last updated
       featuredUpdatedAt: new Date(),
     });
 
