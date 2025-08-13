@@ -13,3 +13,9 @@ export interface Submission {
   isPrivate: boolean;
   isFeatured?: boolean;
 }
+
+export interface Testimonial {
+  quote: string;
+  occupation: string;
+  sector: string;
+}

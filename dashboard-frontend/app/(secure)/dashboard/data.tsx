@@ -7,11 +7,13 @@ import { SectionCards } from "./section-cards";
 import { getSubmissions } from "./query";
 import { SiteHeader } from "@/components/site-header";
 import { useQuery } from "@tanstack/react-query";
-import { Submission } from "@/lib/types";
+import type { Submission, Testimonial } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { RefreshCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RealtimeWrapper } from "@/components/realtime-wrapper";
+import { useMemo } from "react";
+import { TestimonialSection } from "./testimonial-section";
 
 export default function Data({
   initialSubmissions,
@@ -23,6 +25,21 @@ export default function Data({
     queryFn: () => getSubmissions(),
     initialData: initialSubmissions,
   });
+  const testimonials = useMemo(() => {
+    return data
+      .filter((o) => !o.isPrivate && o.isFeatured)
+      .map((submission) => ({
+        quote: submission.question1,
+        occupation:
+          submission.occupationStatus === "Other"
+            ? submission.otherOccupation
+            : submission.occupationStatus,
+        sector:
+          submission.sectorInterest === "Other"
+            ? submission.otherSector
+            : submission.sectorInterest,
+      })) as Testimonial[];
+  }, [data]);
   return (
     <RealtimeWrapper onRefresh={() => refetch()}>
       <SiteHeader
@@ -44,6 +61,8 @@ export default function Data({
       />
       <div className="@container/main flex flex-1 flex-col gap-2">
         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+          <TestimonialSection testimonials={testimonials} />
+
           <SectionCards initialData={data} />
 
           {/* Pie Charts Row */}
