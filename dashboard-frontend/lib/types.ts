@@ -11,4 +11,11 @@ export interface Submission {
   question1: string;
   submittedAt: string | null;
   isPrivate: boolean;
+  isFeatured?: boolean;
+}
+
+export interface Testimonial {
+  quote: string;
+  occupation: string;
+  sector: string;
 }
