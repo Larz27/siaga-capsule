@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 import { RealtimeWrapper } from "@/components/realtime-wrapper";
 import { useMemo } from "react";
 import { TestimonialSection } from "./testimonial-section";
+import { ObstaclesWordCloud } from "./obstacles-word-cloud";
+import { OccupationsRadarChart } from "./occupations-radar-chart";
 
 export default function Data({
   initialSubmissions,
@@ -29,7 +31,7 @@ export default function Data({
     return data
       .filter((o) => !o.isPrivate && o.isFeatured)
       .map((submission) => ({
-        quote: submission.question1,
+        quote: submission.question1Highlighted || submission.question1,
         occupation:
           submission.occupationStatus === "Other"
             ? submission.otherOccupation
@@ -60,21 +62,29 @@ export default function Data({
         }
       />
       <div className="@container/main flex flex-1 flex-col gap-2">
-        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-          <TestimonialSection testimonials={testimonials} />
+        <div className="grid grid-cols-4 gap-4">
+          <div className="col-span-4 md:col-span-3 pt-3">
+            <TestimonialSection testimonials={testimonials} />
+          </div>
 
-          <SectionCards initialData={data} />
+          <div className="col-span-4 md:col-span-1 md:pt-6">
+            <SectionCards initialData={data} />
+          </div>
 
           {/* Pie Charts Row */}
-          <div className="px-4 lg:px-6">
+          <div className="px-4 lg:px-6 col-span-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ValuesPieChart initialData={data} />
-              <ObstaclesPieChart initialData={data} />
+              <div className="flex flex-col gap-4">
+                <ValuesPieChart initialData={data} />
+                <OccupationsRadarChart initialData={data} />
+              </div>
+              {/* <ObstaclesPieChart initialData={data} /> */}
+              <ObstaclesWordCloud initialData={data} />
             </div>
           </div>
 
           {/* Daily Submissions Chart */}
-          <div className="px-4 lg:px-6">
+          <div className="px-4 lg:px-6 col-span-4">
             <DailySubmissionsChart initialData={data} />
           </div>
         </div>

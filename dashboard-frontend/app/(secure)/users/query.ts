@@ -36,6 +36,13 @@ export async function getPublicSubmissions() {
         submittedAt: data.submittedAt?.toDate?.()
           ? data.submittedAt.toDate().toISOString()
           : data.submittedAt || null,
+        question1Highlighted: data.question1Highlighted || "",
+        question1HighlightedUpdatedAt: data.question1HighlightedUpdatedAt?.toDate?.()
+          ? data.question1HighlightedUpdatedAt.toDate().toISOString()
+          : data.question1HighlightedUpdatedAt || null,
+        featuredUpdatedAt: data.featuredUpdatedAt?.toDate?.()
+          ? data.featuredUpdatedAt.toDate().toISOString()
+          : data.featuredUpdatedAt || null,
       };
     });
 
@@ -61,5 +68,22 @@ export async function toggleSubmissionFeatured(
   } catch (error) {
     console.error("Error updating submission featured status:", error);
     throw new Error("Failed to update featured status");
+  }
+}
+
+export async function updateQuestion1Highlighted(
+  submissionId: string,
+  question1Highlighted: string
+) {
+  try {
+    await adminDb.collection("submissions").doc(submissionId).update({
+      question1Highlighted: question1Highlighted,
+      question1HighlightedUpdatedAt: new Date(),
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating question1Highlighted:", error);
+    throw new Error("Failed to update question1Highlighted");
   }
 }

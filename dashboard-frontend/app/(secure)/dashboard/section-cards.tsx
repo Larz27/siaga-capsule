@@ -6,19 +6,23 @@ import {
   IconMapPin,
   IconCalendar,
 } from "@tabler/icons-react";
+import { Bar, BarChart, LabelList, XAxis, YAxis } from "recharts";
 
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartConfig,
+} from "@/components/ui/chart";
 import { Submission } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { getSubmissions } from "./query";
-import Image from "next/image";
 
 export function SectionCards({ initialData }: { initialData: Submission[] }) {
   const { data: submissions } = useQuery({
@@ -34,131 +38,189 @@ export function SectionCards({ initialData }: { initialData: Submission[] }) {
   const privateSubmissions =
     submissions?.filter((s) => s.isPrivate).length || 0;
 
-  // Calculate unique districts and find top district
+  // Calculate unique districts and prepare chart data
   const districtCounts =
     submissions?.reduce((acc, s) => {
       acc[s.district] = (acc[s.district] || 0) + 1;
       return acc;
     }, {} as Record<string, number>) || {};
   const uniqueDistricts = Object.keys(districtCounts).length;
-  const topDistrict = Object.entries(districtCounts).sort(
-    ([, a], [, b]) => b - a
-  )[0];
 
-  // Calculate average age
+  // Get top 8 districts for the chart
+  const topDistricts = Object.entries(districtCounts)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 8);
+
+  // Create chart config with district colors
+  const chartConfig = {
+    count: {
+      label: "Submissions",
+    },
+    ...topDistricts.reduce((config, [district], index) => {
+      const colorKeys = [
+        "chart-1",
+        "chart-2",
+        "chart-3",
+        "chart-4",
+        "chart-5",
+        "primary",
+        "secondary",
+        "muted",
+      ];
+      const safeDistrictKey = district
+        .replace(/[^a-zA-Z0-9]/g, "_")
+        .toLowerCase();
+      config[safeDistrictKey] = {
+        label: district,
+        color: `var(--${colorKeys[index % colorKeys.length]})`,
+      };
+      return config;
+    }, {} as Record<string, { label: string; color: string }>),
+  } satisfies ChartConfig;
+
+  // Prepare chart data using the proper format
+  const chartData = topDistricts.map(([district, count]) => {
+    const safeDistrictKey = district
+      .replace(/[^a-zA-Z0-9]/g, "_")
+      .toLowerCase();
+    return {
+      district: district.length > 12 ? district.slice(0, 12) + "..." : district,
+      count,
+      fullName: district,
+      fill: `var(--color-${safeDistrictKey})`,
+    };
+  });
+
+  // Calculate age distribution by ranges (Brunei youth age is 35)
   const validAges = submissions?.filter((s) => s.age && s.age > 0) || [];
-  const averageAge =
-    validAges.length > 0
-      ? Math.round(
-          validAges.reduce((sum, s) => sum + s.age, 0) / validAges.length
-        )
-      : 0;
 
-  // Calculate min and max ages
-  const minAge =
-    validAges.length > 0 ? Math.min(...validAges.map((s) => s.age)) : 0;
-  const maxAge =
-    validAges.length > 0 ? Math.max(...validAges.map((s) => s.age)) : 0;
+  const ageRanges = [
+    { range: "Under 18", label: "Minors", min: 0, max: 17 },
+    { range: "18-35", label: "Youth", min: 18, max: 35 },
+    { range: "36-55", label: "Adults", min: 36, max: 55 },
+    { range: "56+", label: "Seniors", min: 56, max: 150 },
+  ];
+
+  // Count submissions in each age range
+  const ageDistribution = ageRanges.map(({ range, label, min, max }) => {
+    const count = validAges.filter((s) => s.age >= min && s.age <= max).length;
+    return {
+      range,
+      label,
+      count,
+      fill: `var(--color-${range.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()})`,
+    };
+  });
+
+  // Create age chart config
+  const ageChartConfig = {
+    count: { label: "People" },
+    under_18: { label: "Minors (Under 18)", color: "var(--chart-1)" },
+    "18_35": { label: "Youth (18-35)", color: "var(--chart-2)" },
+    "36_55": { label: "Adults (36-55)", color: "var(--chart-3)" },
+    "56_": { label: "Seniors (56+)", color: "var(--chart-4)" },
+  } satisfies ChartConfig;
 
   return (
-    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      {/* QR Code CTA Card */}
-      <Card className="@container/card bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+    <div className="grid grid-cols-1 gap-4 px-6 md:pl-0">
+      {/* Geographic Coverage Chart */}
+      <Card className="@container/card gap-0">
         <CardHeader>
-          <CardDescription className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
-            <IconQrcode className="size-5" />
-            Time Capsule Access
-          </CardDescription>
-          <CardDescription className="flex items-center justify-between gap-4">
-            <Image
-              src="/images/qr-code.png"
-              className="rounded-md"
-              alt="QR Code"
-              width={100}
-              height={100}
-            />
-            <div className="line-clamp-1 flex gap-2 font-medium text-blue-800 dark:text-blue-200 text-xs">
-              Scan the QR code to access the time capsule submission form
-            </div>
-          </CardDescription>
-        </CardHeader>
-      </Card>
-
-      {/* Total Submissions Card */}
-      <Card className="@container/card">
-        <CardHeader className="pb-3">
-          <CardDescription className="flex items-center gap-2 text-sm">
-            <IconUsers className="size-4" />
-            Total Submissions
-          </CardDescription>
-          <CardTitle className="text-3xl font-bold tabular-nums">
-            {totalSubmissions.toLocaleString()}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              {publicSubmissions} public • {privateSubmissions} private
-            </div>
-            <Badge
-              variant="outline"
-              className="text-green-700 border-green-300 dark:text-green-300 dark:border-green-600"
-            >
-              <IconUsers className="size-3 mr-1" />
-              Active
-            </Badge>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Geographic Coverage Card */}
-      <Card className="@container/card">
-        <CardHeader className="pb-3">
           <CardDescription className="flex items-center gap-2 text-sm">
             <IconMapPin className="size-4" />
-            Districts Covered
+            Districts
           </CardDescription>
-          <CardTitle className="text-3xl font-bold tabular-nums">
-            {uniqueDistricts}
-          </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              Top: {topDistrict?.[0] || "N/A"} ({topDistrict?.[1] || 0})
-            </div>
-            <Badge variant="outline">
-              <IconMapPin className="size-3 mr-1" />
-              Coverage
-            </Badge>
-          </div>
+          <ChartContainer config={chartConfig} className="h-[150px] w-full">
+            <BarChart
+              accessibilityLayer
+              data={chartData}
+              layout="vertical"
+              margin={{
+                left: 12,
+                right: 16,
+                top: 8,
+                bottom: 8,
+              }}
+            >
+              <YAxis
+                dataKey="district"
+                type="category"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                className="text-xs"
+                width={80}
+              />
+              <XAxis dataKey="count" type="number" hide />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent />}
+                formatter={(value, _, props) => [value]}
+              />
+              <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                <LabelList
+                  dataKey="count"
+                  position="right"
+                  offset={8}
+                  className="fill-foreground text-xs"
+                />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
         </CardContent>
       </Card>
 
-      {/* Average Age Card */}
-      <Card className="@container/card">
-        <CardHeader className="pb-3">
+      {/* Age Distribution Chart */}
+      <Card className="@container/card gap-0">
+        <CardHeader>
           <CardDescription className="flex items-center gap-2 text-sm">
             <IconCalendar className="size-4" />
-            Average Age
+            Age Distribution
           </CardDescription>
-          <CardTitle className="text-3xl font-bold tabular-nums">
-            {averageAge}
-          </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              {minAge} - {maxAge} years
-            </div>
-            <Badge
-              variant="outline"
-              className="text-orange-700 border-orange-300 dark:text-orange-300 dark:border-orange-600"
+          <ChartContainer config={ageChartConfig} className="h-[150px] w-full">
+            <BarChart
+              accessibilityLayer
+              data={ageDistribution}
+              layout="vertical"
+              margin={{
+                left: 12,
+                right: 16,
+                top: 8,
+                bottom: 8,
+              }}
             >
-              <IconCalendar className="size-3 mr-1" />
-              Demographics
-            </Badge>
-          </div>
+              <YAxis
+                dataKey="range"
+                type="category"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                className="text-xs"
+                width={60}
+              />
+              <XAxis dataKey="count" type="number" hide />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent />}
+                formatter={(value, _, props) => [
+                  value,
+                  `${props.payload.label}: ${value} people`,
+                ]}
+              />
+              <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                <LabelList
+                  dataKey="count"
+                  position="right"
+                  offset={8}
+                  className="fill-foreground text-xs"
+                />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
         </CardContent>
       </Card>
     </div>

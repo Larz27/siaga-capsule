@@ -9,9 +9,12 @@ export interface Submission {
   values: string[];
   obstacles: string[];
   question1: string;
+  question1Highlighted?: string;
+  question1HighlightedUpdatedAt?: string;
   submittedAt: string | null;
   isPrivate: boolean;
   isFeatured?: boolean;
+  featuredUpdatedAt?: string;
 }
 
 export interface Testimonial {

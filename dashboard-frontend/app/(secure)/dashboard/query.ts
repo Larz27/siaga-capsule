@@ -55,6 +55,7 @@ export async function getSubmissions(isPrivate?: boolean | null) {
           ? data.submittedAt.toDate().toISOString()
           : data.submittedAt || null,
         isFeatured: data.isFeatured || false,
+        question1Highlighted: data.question1Highlighted || "",
       };
     });
 

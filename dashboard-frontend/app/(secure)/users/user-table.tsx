@@ -25,6 +25,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import ReactMarkdown from "react-markdown";
 import {
   Select,
   SelectContent,
@@ -121,9 +122,7 @@ const UserTable = React.memo(
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <React.Fragment key={row.id}>
-                    <TableRow
-                      data-state={row.getIsSelected() && "selected"}
-                    >
+                    <TableRow data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
                           {flexRender(
@@ -133,7 +132,7 @@ const UserTable = React.memo(
                         </TableCell>
                       ))}
                     </TableRow>
-                    
+
                     {/* Expandable row with full submission details */}
                     {expandedRows.has(row.original.id) && (
                       <TableRow>
@@ -147,25 +146,40 @@ const UserTable = React.memo(
                                 </h4>
                                 <div className="space-y-2">
                                   <div>
-                                    <span className="text-sm font-medium">Age:</span>
-                                    <span className="ml-2 text-sm">{row.original.age || "N/A"}</span>
-                                  </div>
-                                  <div>
-                                    <span className="text-sm font-medium">District:</span>
-                                    <span className="ml-2 text-sm">{row.original.district || "N/A"}</span>
-                                  </div>
-                                  <div>
-                                    <span className="text-sm font-medium">Occupation:</span>
+                                    <span className="text-sm font-medium">
+                                      Age:
+                                    </span>
                                     <span className="ml-2 text-sm">
-                                      {row.original.occupationStatus === "Other" && row.original.otherOccupation
-                                        ? row.original.otherOccupation
-                                        : row.original.occupationStatus || "N/A"}
+                                      {row.original.age || "N/A"}
                                     </span>
                                   </div>
                                   <div>
-                                    <span className="text-sm font-medium">Sector Interest:</span>
+                                    <span className="text-sm font-medium">
+                                      District:
+                                    </span>
                                     <span className="ml-2 text-sm">
-                                      {row.original.sectorInterest === "Other" && row.original.otherSector
+                                      {row.original.district || "N/A"}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium">
+                                      Occupation:
+                                    </span>
+                                    <span className="ml-2 text-sm">
+                                      {row.original.occupationStatus ===
+                                        "Other" && row.original.otherOccupation
+                                        ? row.original.otherOccupation
+                                        : row.original.occupationStatus ||
+                                          "N/A"}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium">
+                                      Sector Interest:
+                                    </span>
+                                    <span className="ml-2 text-sm">
+                                      {row.original.sectorInterest ===
+                                        "Other" && row.original.otherSector
                                         ? row.original.otherSector
                                         : row.original.sectorInterest || "N/A"}
                                     </span>
@@ -180,30 +194,50 @@ const UserTable = React.memo(
                                 </h4>
                                 <div className="space-y-2">
                                   <div>
-                                    <span className="text-sm font-medium">Values:</span>
+                                    <span className="text-sm font-medium">
+                                      Values:
+                                    </span>
                                     <div className="mt-1 flex flex-wrap gap-1">
                                       {row.original.values?.length > 0 ? (
-                                        row.original.values.map((value, index) => (
-                                          <Badge key={index} variant="secondary" className="text-xs">
-                                            {value}
-                                          </Badge>
-                                        ))
+                                        row.original.values.map(
+                                          (value, index) => (
+                                            <Badge
+                                              key={index}
+                                              variant="secondary"
+                                              className="text-xs"
+                                            >
+                                              {value}
+                                            </Badge>
+                                          )
+                                        )
                                       ) : (
-                                        <span className="text-sm text-muted-foreground">None specified</span>
+                                        <span className="text-sm text-muted-foreground">
+                                          None specified
+                                        </span>
                                       )}
                                     </div>
                                   </div>
                                   <div>
-                                    <span className="text-sm font-medium">Obstacles:</span>
+                                    <span className="text-sm font-medium">
+                                      Obstacles:
+                                    </span>
                                     <div className="mt-1 flex flex-wrap gap-1">
                                       {row.original.obstacles?.length > 0 ? (
-                                        row.original.obstacles.map((obstacle, index) => (
-                                          <Badge key={index} variant="outline" className="text-xs">
-                                            {obstacle}
-                                          </Badge>
-                                        ))
+                                        row.original.obstacles.map(
+                                          (obstacle, index) => (
+                                            <Badge
+                                              key={index}
+                                              variant="outline"
+                                              className="text-xs"
+                                            >
+                                              {obstacle}
+                                            </Badge>
+                                          )
+                                        )
                                       ) : (
-                                        <span className="text-sm text-muted-foreground">None specified</span>
+                                        <span className="text-sm text-muted-foreground">
+                                          None specified
+                                        </span>
                                       )}
                                     </div>
                                   </div>
@@ -217,11 +251,42 @@ const UserTable = React.memo(
                                 </h4>
                                 <div className="bg-background rounded-lg p-4 border">
                                   <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                                    {row.original.question1 || "No response provided"}
+                                    {row.original.question1 ||
+                                      "No response provided"}
                                   </p>
                                 </div>
+                                {row.original.question1Highlighted && (
+                                  <>
+                                    <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mt-4">
+                                      AI Processed Response
+                                    </h4>
+                                    <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800 break-words whitespace-pre-wrap">
+                                      <ReactMarkdown
+                                        components={{
+                                          strong: ({ children }) => (
+                                            <strong className="font-semibold text-blue-700 dark:text-blue-300">
+                                              {children}
+                                            </strong>
+                                          ),
+                                          p: ({ children }) => (
+                                            <p className="mb-2 last:mb-0 break-words">
+                                              {children}
+                                            </p>
+                                          ),
+                                        }}
+                                      >
+                                        {row.original.question1Highlighted}
+                                      </ReactMarkdown>
+                                    </div>
+                                  </>
+                                )}
                                 <div className="text-xs text-muted-foreground">
-                                  Submitted: {row.original.submittedAt ? new Date(row.original.submittedAt).toLocaleString() : "Unknown"}
+                                  Submitted:{" "}
+                                  {row.original.submittedAt
+                                    ? new Date(
+                                        row.original.submittedAt
+                                      ).toLocaleString()
+                                    : "Unknown"}
                                 </div>
                               </div>
                             </div>

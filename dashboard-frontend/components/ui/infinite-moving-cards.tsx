@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 export const InfiniteMovingCards = ({
   items,
@@ -99,17 +100,18 @@ export const InfiniteMovingCards = ({
             key={`${item.name}-${idx}`}
           >
             {/* Content container */}
-            <div className="relative z-10 px-8 py-8 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 rounded-3xl">
-              {/* Decorative gradient border */}
-              <div className="absolute -z-10 inset-0 rounded-3xl bg-gradient-to-br from-purple-500/20 via-blue-500/20 to-purple-600/20 p-[1px]">
+            <div className="relative z-10 px-8 py-8 hover:shadow-2xl hover:scale-[1.05] transition-all duration-500 rounded-3xl shadow-xl">
+              {/* Enhanced gradient border with stronger colors */}
+              <div className="absolute -z-10 inset-0 rounded-3xl bg-gradient-to-br from-purple-600/40 via-blue-600/40 to-purple-700/40 p-[2px]">
                 <div className="h-full w-full rounded-3xl bg-white dark:bg-gray-900"></div>
               </div>
+
               <blockquote>
                 {/* Quote icon */}
                 <div className="mb-4 flex items-center">
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-700 flex items-center justify-center shadow-lg">
                     <svg
-                      className="h-4 w-4 text-white"
+                      className="h-5 w-5 text-white drop-shadow-sm"
                       fill="currentColor"
                       viewBox="0 0 24 24"
                     >
@@ -118,28 +120,41 @@ export const InfiniteMovingCards = ({
                   </div>
                 </div>
 
-                {/* Quote text with improved typography */}
-                <span className="relative z-20 text-base leading-[1.7] font-medium text-gray-800 dark:text-gray-100">
-                  &quot;{item.quote}&quot;
-                </span>
+                {/* Quote text with enhanced prominence */}
+                <div className="relative z-20 text-sm leading-[1.8] font-semibold text-gray-900 dark:text-white drop-shadow-sm">
+                  <ReactMarkdown
+                    components={{
+                      strong: ({ children }) => (
+                        <strong className="font-bold text-purple-700 dark:text-purple-300">
+                          {children}
+                        </strong>
+                      ),
+                      p: ({ children }) => (
+                        <span className="inline">{children}</span>
+                      ),
+                    }}
+                  >
+                    {item.quote}
+                  </ReactMarkdown>
+                </div>
 
                 {/* Author information with better layout */}
                 <div className="relative z-20 mt-8 flex flex-row items-center">
                   <div className="flex flex-col gap-1">
-                    <span className="text-sm font-semibold leading-tight text-gray-900 dark:text-white">
+                    <span className="text-base font-bold leading-tight text-gray-900 dark:text-white">
                       {item.name}
                     </span>
-                    <span className="text-sm leading-tight text-gray-600 dark:text-gray-300">
+                    <span className="text-sm font-medium leading-tight text-purple-700 dark:text-purple-300">
                       {item.title}
                     </span>
                   </div>
 
                   {/* Decorative accent */}
-                  <div className="ml-auto h-1 w-12 rounded-full bg-gradient-to-r from-purple-500 to-blue-600 opacity-60"></div>
+                  <div className="ml-auto h-2 w-16 rounded-full bg-gradient-to-r from-purple-600 to-blue-700 opacity-80 shadow-md"></div>
                 </div>
               </blockquote>
               {/* Hover effect overlay */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/5 via-blue-500/5 to-purple-600/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/15 via-blue-500/15 to-purple-600/15 opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
             </div>
           </li>
         ))}

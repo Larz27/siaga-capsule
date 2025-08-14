@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, Label, Sector } from "recharts";
+import { PieSectorDataItem } from "recharts/types/polar/Pie";
 
 import {
   Card,
@@ -10,12 +11,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ChartContainer, ChartConfig } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartConfig,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { Submission } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { getSubmissions } from "./query";
 
-export const description = "A pie chart showing the distribution of values mentioned in submissions";
+export const description =
+  "A pie chart showing the distribution of values mentioned in submissions";
 
 // Color palette for the pie chart segments
 const COLORS = [
@@ -55,8 +62,8 @@ export function ValuesPieChart({ initialData }: ValuesPieChartProps) {
     if (!submissions) return [];
 
     // Extract all values from submissions
-    const allValues = submissions.flatMap(s => s.values);
-    
+    const allValues = submissions.flatMap((s) => s.values);
+
     // Count occurrences of each value
     const valueCounts = allValues.reduce((acc, value) => {
       acc[value] = (acc[value] || 0) + 1;
@@ -65,13 +72,11 @@ export function ValuesPieChart({ initialData }: ValuesPieChartProps) {
 
     // Convert to array and sort by count (descending)
     const sortedValues = Object.entries(valueCounts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .map(([value, count], index) => ({
         name: value,
         value: count,
-        color: COLORS[index % COLORS.length],
-        // Show label for top 4 values, hide for others
-        showLabel: index < 4,
+        fill: COLORS[index % COLORS.length],
       }));
 
     return sortedValues;
@@ -79,91 +84,121 @@ export function ValuesPieChart({ initialData }: ValuesPieChartProps) {
 
   // Calculate total submissions for percentage display
   const totalSubmissions = submissions?.length || 0;
-  
-  // Calculate total value mentions for percentage calculation
-  const totalValueMentions = valuesData.reduce((sum, item) => sum + item.value, 0);
 
-  // Custom tooltip content
-  const CustomTooltip = ({ active, payload }: {
-    active: boolean;
-    payload: {
-      payload: {
-        name: string;
-        value: number;
-      };
-    }[];
-  }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      const percentage = totalValueMentions > 0 ? ((data.value / totalValueMentions) * 100).toFixed(1) : 0;
-      
-      return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold text-gray-800">{data.name}</p>
-          <p className="text-gray-600">
-            {data.value} mentions ({percentage}% of all values)
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  // Custom legend content
-  const CustomLegend = () => (
-    <div className="flex flex-wrap gap-2 justify-center mt-4">
-      {valuesData.slice(0, 8).map((entry) => (
-        <div key={entry.name} className="flex items-center gap-2">
-          <div 
-            className="w-3 h-3 rounded-full" 
-            style={{ backgroundColor: entry.color }}
-          />
-          <span className="text-sm text-gray-600">
-            {entry.name} ({entry.value})
-          </span>
-        </div>
-      ))}
-    </div>
-  );
+  // The highest contributor is automatically the first item (already sorted)
+  const activeIndex = 0;
 
   return (
-    <Card>
+    <Card className="gap-0">
       <CardHeader>
         <CardTitle>Values Distribution</CardTitle>
         <CardDescription>
-          Most commonly mentioned values in submissions ({totalSubmissions} total)
+          Most commonly mentioned values in submissions ({totalSubmissions}{" "}
+          total)
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[400px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={valuesData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, showLabel, percent }) => {
-                  // Only show labels for top values or when percentage is significant
-                  if (showLabel || percent > 0.05) {
-                    return `${name}`;
+      <CardContent className="flex flex-1 justify-center pb-0">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square w-full max-w-[80%]"
+        >
+          <PieChart
+            margin={{
+              top: 0,
+              right: 20,
+              bottom: 0,
+              left: 20,
+            }}
+          >
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Pie
+              data={valuesData}
+              dataKey="value"
+              nameKey="name"
+              innerRadius={60}
+              strokeWidth={5}
+              activeIndex={activeIndex}
+              label={({ name, percent, cx, cy, midAngle, innerRadius, outerRadius }) => {
+                if (percent > 0.05) {
+                  // Calculate label position
+                  const RADIAN = Math.PI / 180;
+                  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                  
+                  return (
+                    <text 
+                      x={x} 
+                      y={y} 
+                      fill="white" 
+                      textAnchor={x > cx ? 'start' : 'end'} 
+                      dominantBaseline="central"
+                      style={{ 
+                        textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
+                        filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.8))',
+                        fontSize: '12px',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {name}
+                    </text>
+                  );
+                }
+                return null;
+              }}
+              labelLine={false}
+              activeShape={({
+                outerRadius = 0,
+                ...props
+              }: PieSectorDataItem) => (
+                <g>
+                  <Sector {...props} outerRadius={outerRadius + 10} />
+                  <Sector
+                    {...props}
+                    outerRadius={outerRadius + 25}
+                    innerRadius={outerRadius + 12}
+                  />
+                </g>
+              )}
+            >
+              {valuesData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill} />
+              ))}
+              <Label
+                content={({ viewBox }) => {
+                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                    return (
+                      <text
+                        x={viewBox.cx}
+                        y={viewBox.cy}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                      >
+                        <tspan
+                          x={viewBox.cx}
+                          y={viewBox.cy}
+                          className="fill-foreground text-3xl font-bold"
+                        >
+                          {totalSubmissions.toLocaleString()}
+                        </tspan>
+                        <tspan
+                          x={viewBox.cx}
+                          y={(viewBox.cy || 0) + 24}
+                          className="fill-muted-foreground"
+                        >
+                          Submissions
+                        </tspan>
+                      </text>
+                    );
                   }
-                  return "";
                 }}
-                outerRadius={120}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {valuesData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              {/* @ts-expect-error - recharts types are not up to date? */}
-              <Tooltip content={<CustomTooltip />} />
-            </PieChart>
-          </ResponsiveContainer>
+              />
+            </Pie>
+          </PieChart>
         </ChartContainer>
-        <CustomLegend />
       </CardContent>
     </Card>
   );
