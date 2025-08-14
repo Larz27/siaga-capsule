@@ -1,9 +1,9 @@
-import { SignIn } from "@clerk/nextjs";
-import { currentUser } from "@clerk/nextjs/server";
+'use client'
+import { SignIn, useUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
-export default async function Home() {
-  const user = await currentUser();
+export default function Home() {
+  const { user } = useUser();
   if (user) {
     return redirect("/dashboard");
   }
