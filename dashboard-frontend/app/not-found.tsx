@@ -22,7 +22,7 @@ export default function NotFound() {
             Page Not Found
           </h2>
           <p className="text-gray-600 leading-relaxed">
-            The page you're looking for seems to have vanished into the digital
+            The page you&apos;re looking for seems to have vanished into the digital
             ether. It might have been moved, deleted, or perhaps it never
             existed in this timeline.
           </p>
