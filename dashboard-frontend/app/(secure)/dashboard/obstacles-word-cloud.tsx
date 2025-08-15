@@ -83,10 +83,7 @@ export function ObstaclesWordCloud({ initialData }: ObstaclesWordCloudProps) {
   return (
     <Card className="gap-0">
       <CardHeader>
-        <CardTitle>Obstacles Word Cloud</CardTitle>
-        <CardDescription>
-          Most frequently mentioned challenges - size represents frequency ({totalSubmissions} total submissions)
-        </CardDescription>
+        <CardTitle>🚧 Obstacles faced by Youth</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center gap-4 p-6 min-h-[400px] justify-center">

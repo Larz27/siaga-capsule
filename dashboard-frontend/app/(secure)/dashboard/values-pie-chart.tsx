@@ -91,11 +91,7 @@ export function ValuesPieChart({ initialData }: ValuesPieChartProps) {
   return (
     <Card className="gap-0">
       <CardHeader>
-        <CardTitle>Values Distribution</CardTitle>
-        <CardDescription>
-          Most commonly mentioned values in submissions ({totalSubmissions}{" "}
-          total)
-        </CardDescription>
+        <CardTitle>🫶🏻 Values that the Youth resonate with</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-1 justify-center pb-0">
         <ChartContainer
@@ -121,29 +117,53 @@ export function ValuesPieChart({ initialData }: ValuesPieChartProps) {
               innerRadius={60}
               strokeWidth={5}
               activeIndex={activeIndex}
-              label={({ name, percent, cx, cy, midAngle, innerRadius, outerRadius }) => {
+              label={({
+                name,
+                percent,
+                cx,
+                cy,
+                midAngle,
+                innerRadius,
+                outerRadius,
+                index,
+              }) => {
                 if (percent > 0.05) {
                   // Calculate label position
                   const RADIAN = Math.PI / 180;
-                  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                  const radius =
+                    innerRadius + (outerRadius - innerRadius) * 0.5;
                   const x = cx + radius * Math.cos(-midAngle * RADIAN);
                   const y = cy + radius * Math.sin(-midAngle * RADIAN);
-                  
+
+                  // Show percentage for top 3 values only
+                  const isTop3 = index < 3;
+
                   return (
-                    <text 
-                      x={x} 
-                      y={y} 
-                      fill="white" 
-                      textAnchor={x > cx ? 'start' : 'end'} 
+                    <text
+                      x={x}
+                      y={y}
+                      fill="white"
+                      textAnchor={x > cx ? "start" : "end"}
                       dominantBaseline="central"
-                      style={{ 
-                        textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
-                        filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.8))',
-                        fontSize: '12px',
-                        fontWeight: 'bold'
+                      style={{
+                        textShadow: "1px 1px 2px rgba(0,0,0,0.8)",
+                        filter: "drop-shadow(1px 1px 2px rgba(0,0,0,0.8))",
+                        fontSize: "12px",
+                        fontWeight: "bold",
                       }}
                     >
-                      {name}
+                      {isTop3 ? (
+                        <>
+                          <tspan x={x} dy="-0.3em">
+                            {name}
+                          </tspan>
+                          <tspan x={x} dy="1.2em">
+                            {(percent * 100).toFixed(1)}%
+                          </tspan>
+                        </>
+                      ) : (
+                        <tspan>{name}</tspan>
+                      )}
                     </text>
                   );
                 }

@@ -84,10 +84,7 @@ export function OccupationsRadarChart({
   return (
     <Card className="gap-0">
       <CardHeader className="items-center">
-        <CardTitle>Occupations Distribution</CardTitle>
-        <CardDescription>
-          Most common occupations among respondents ({totalSubmissions} total)
-        </CardDescription>
+        <CardTitle>🎒 Occupations of the Youth</CardTitle>
       </CardHeader>
       <CardContent className="pb-0">
         <ChartContainer

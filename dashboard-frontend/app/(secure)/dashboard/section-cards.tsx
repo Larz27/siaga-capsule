@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  IconQrcode,
-  IconUsers,
-  IconMapPin,
-  IconCalendar,
-} from "@tabler/icons-react";
+import { IconMapPin, IconCalendar } from "@tabler/icons-react";
 import { Bar, BarChart, LabelList, XAxis, YAxis } from "recharts";
 
 import {
@@ -30,13 +25,6 @@ export function SectionCards({ initialData }: { initialData: Submission[] }) {
     queryFn: () => getSubmissions(),
     initialData,
   });
-
-  // Calculate statistics that complement the charts
-  const totalSubmissions = submissions?.length || 0;
-  const publicSubmissions =
-    submissions?.filter((s) => !s.isPrivate).length || 0;
-  const privateSubmissions =
-    submissions?.filter((s) => s.isPrivate).length || 0;
 
   // Calculate unique districts and prepare chart data
   const districtCounts =
@@ -157,7 +145,7 @@ export function SectionCards({ initialData }: { initialData: Submission[] }) {
               <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent />}
-                formatter={(value, _, props) => [value]}
+                formatter={(value, _, props) => [`${value} submission`]}
               />
               <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                 <LabelList
@@ -206,10 +194,7 @@ export function SectionCards({ initialData }: { initialData: Submission[] }) {
               <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent />}
-                formatter={(value, _, props) => [
-                  value,
-                  `${props.payload.label}: ${value} people`,
-                ]}
+                formatter={(value, _, props) => [`${value} submission`]}
               />
               <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                 <LabelList

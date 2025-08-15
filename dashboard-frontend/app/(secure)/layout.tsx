@@ -26,7 +26,7 @@ export default async function Layout({
       >
         <AppSidebar variant="inset" />
         <SidebarInset>
-          <div className="flex flex-1 flex-col">{children}</div>
+          <div className="flex flex-1 flex-col pb-6">{children}</div>
         </SidebarInset>
       </SidebarProvider>
     </SignedIn>
