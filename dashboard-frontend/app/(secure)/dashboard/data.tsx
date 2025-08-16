@@ -63,13 +63,13 @@ export default function Data({
       />
       <div className="@container/main flex flex-1 flex-col gap-2">
         <div className="grid grid-cols-4 gap-4">
-          <div className="col-span-4 md:col-span-4 pt-3">
+          <div className="col-span-4 md:col-span-3 pt-3">
             <TestimonialSection testimonials={testimonials} />
           </div>
 
-          {/* <div className="col-span-4 md:col-span-1 md:pt-6">
+          <div className="col-span-4 md:col-span-1 md:pt-6">
             <SectionCards initialData={data} />
-          </div> */}
+          </div>
 
           {/* Pie Charts Row */}
           <div className="px-4 lg:px-6 col-span-4">
